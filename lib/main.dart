@@ -56,8 +56,8 @@ class MyApp extends StatelessWidget {
       // home: Screens(),
       // home: Absensi(),
       // home: IsiJurnal(),
-      initialRoute: onboardingRoute,
-      // initialRoute: userBox.isEmpty ? onboardingRoute : homeRoute,
+      // initialRoute: onboardingRoute,
+      initialRoute: userBox.isEmpty ? onboardingRoute : homeRoute,
       routes: {
         homeRoute: (context) => const Screens(selectedIndex: 0),
         loginRoute: (context) => const LogIn(),
