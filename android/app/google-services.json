@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "885872350985",
+    "project_id": "flutter-jurnal",
+    "storage_bucket": "flutter-jurnal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:885872350985:android:ac9388281848fd3e8865d8",
+        "android_client_info": {
+          "package_name": "com.skensa.e_jupe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "885872350985-k5o3e0035tv1vl002q6ss8r2knh24c4p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlX9vqDH2KfFTH8JPR1d07If1CeD_ncJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "885872350985-k5o3e0035tv1vl002q6ss8r2knh24c4p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "885872350985-nqac2gp8jekqdtjoq58a1kfg0hh7if80.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.eJupeSkensa.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
