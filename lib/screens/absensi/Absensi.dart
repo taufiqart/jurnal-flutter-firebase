@@ -195,8 +195,8 @@ class _AbsensiState extends State<Absensi> {
                 ExternalPath.DIRECTORY_DOCUMENTS);
 
         var fileName =
-            DateTime.now().toString().replaceAll(' ', '_').split('.')[1];
-        final String filePath = '${path}/${fileName}.xlsx';
+            DateTime.now().toString().replaceAll(' ', '_').split('.')[0];
+        final String filePath = '${path}/absensi-${fileName}.xlsx';
         await File(filePath).create(recursive: true);
         final File file = File(filePath);
         await file.writeAsBytes(bytes, flush: true);
@@ -230,6 +230,11 @@ class _AbsensiState extends State<Absensi> {
         );
       }
     } else {
+      if (await Permission.manageExternalStorage.isDenied) {
+        await Permission.manageExternalStorage.request();
+      } else if (await Permission.storage.isDenied) {
+        await Permission.storage.request();
+      }
       Toast.show(
         'Ijinkan mengakses penyimpanan',
         duration: 2,
@@ -241,8 +246,6 @@ class _AbsensiState extends State<Absensi> {
           color: Colors.black,
         ),
       );
-      await Permission.manageExternalStorage.request();
-      await Permission.storage.request();
     }
   }
 

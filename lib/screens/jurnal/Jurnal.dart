@@ -267,7 +267,7 @@ class _JurnalState extends State<Jurnal> {
                 ExternalPath.DIRECTORY_DOCUMENTS);
 
         var fileName =
-            DateTime.now().toString().replaceAll(' ', '_').split('.')[1];
+            DateTime.now().toString().replaceAll(' ', '_').split('.')[0];
         final String filePath = '${path}/Jurnal-${fileName}.xlsx';
         await File(filePath).create(recursive: true);
         final File file = File(filePath);
@@ -302,6 +302,11 @@ class _JurnalState extends State<Jurnal> {
         );
       }
     } else {
+      if (await Permission.manageExternalStorage.isDenied) {
+        await Permission.manageExternalStorage.request();
+      } else if (await Permission.storage.isDenied) {
+        await Permission.storage.request();
+      }
       Toast.show(
         'Ijinkan mengakses penyimpanan',
         duration: 2,
@@ -313,8 +318,6 @@ class _JurnalState extends State<Jurnal> {
           color: Colors.black,
         ),
       );
-      await Permission.manageExternalStorage.request();
-      await Permission.storage.request();
     }
   }
 
