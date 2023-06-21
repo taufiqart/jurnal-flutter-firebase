@@ -13,10 +13,12 @@ import 'package:e_jupe_skensa/screens/profile/EditProfile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Hive.initFlutter();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -25,6 +27,7 @@ void main() async {
   var userBox = await Hive.openBox('user');
 
   runApp(const MyApp());
+  // FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -44,18 +47,10 @@ class MyApp extends StatelessWidget {
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: nameApp,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-
-      // home: Onboarding(),
-      // home: SignUp(),
-      // home: LogIn(),
-      // home: Home(),
-      // home: Screens(),
-      // home: Absensi(),
-      // home: IsiJurnal(),
       // initialRoute: onboardingRoute,
       initialRoute: userBox.isEmpty ? onboardingRoute : homeRoute,
       routes: {

@@ -50,6 +50,19 @@ dependencies:
   confirm_dialog: ^1.0.2
   image_picker: ^0.8.9
   path: ^1.8.3
+  flutter_native_splash: ^2.1.1
+
+andoid:
+flutter_icons:
+  android: true
+  image_path: "assets/images/splash_title.png"
+
+flutter_native_splash:
+  android: true
+  android_12:
+    image: "assets/images/splash_title.png"
+  image: "assets/images/splash_title.png"
+  color: "#FFFFFF"
 
 dev_dependencies:
   flutter_test:
