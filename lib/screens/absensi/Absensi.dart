@@ -1,4 +1,7 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, await_only_futures, unnecessary_brace_in_string_interps, prefer_is_empty, avoid_unnecessary_containers, file_names
+// ignore_for_file: prefer_typing_uninitialized_variables, await_only_futures, unnecessary_brace_in_string_interps, prefer_is_empty, avoid_unnecessary_containers, file_names, unused_element
+
+import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_jupe_skensa/components/Button.dart';
@@ -6,12 +9,17 @@ import 'package:e_jupe_skensa/components/ButtonCard.dart';
 import 'package:e_jupe_skensa/config/variable.dart';
 import 'package:e_jupe_skensa/models/AbsensiModel.dart';
 import 'package:e_jupe_skensa/models/UserModel.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column, Stack, Row;
+import 'package:open_file/open_file.dart';
+import 'package:toast/toast.dart';
 
 class Absensi extends StatefulWidget {
   const Absensi({super.key});
@@ -29,6 +37,7 @@ class _AbsensiState extends State<Absensi> {
   var today = false;
   var loading = true;
   var timer;
+  Iterable<AbsensiModel?>? globalAbsensis;
   var userBox = Hive.box('user');
 
   void confirmAbsensi(absensi, status) async {
@@ -129,12 +138,112 @@ class _AbsensiState extends State<Absensi> {
           today = true;
         }
       } else {
-        today = true;
+        today = false;
         absen = true;
         lastAbsen = masukText;
       }
     });
+
     return absensis;
+  }
+
+  void cetakData() async {
+    var managestorage = await Permission.manageExternalStorage;
+    var storage = await Permission.storage.request();
+    if (await storage.isGranted && await managestorage.isGranted) {
+      if (globalAbsensis != null) {
+        final Workbook workbook = Workbook();
+        final Worksheet sheet = workbook.worksheets[0];
+
+        List<ExcelDataRow> _buildReportDataRows() {
+          List<ExcelDataRow> excelDataRows = <ExcelDataRow>[];
+
+          excelDataRows = globalAbsensis!.map<ExcelDataRow>((dataRow) {
+            return ExcelDataRow(cells: <ExcelDataCell>[
+              ExcelDataCell(
+                columnHeader: 'Nama Lengkap',
+                value: dataRow?.user!.fullName,
+              ),
+              ExcelDataCell(
+                columnHeader: 'Absensi',
+                value: dataRow?.absensi,
+              ),
+              ExcelDataCell(columnHeader: 'Status', value: dataRow?.status),
+              ExcelDataCell(
+                columnHeader: 'Tanggal',
+                value: DateFormat('dd/MM/yyyy HH:mm:ss')
+                    .format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                        dataRow!.createdAt,
+                      ),
+                    )
+                    .toString(),
+              )
+            ]);
+          }).toList();
+
+          return excelDataRows;
+        }
+
+        final List<ExcelDataRow> dataRows = _buildReportDataRows();
+        sheet.importData(dataRows, 1, 1);
+
+        final List<int> bytes = workbook.saveAsStream();
+        workbook.dispose();
+        final String path =
+            await ExternalPath.getExternalStoragePublicDirectory(
+                ExternalPath.DIRECTORY_DOCUMENTS);
+
+        var fileName =
+            DateTime.now().toString().replaceAll(' ', '_').split('.')[1];
+        final String filePath = '${path}/${fileName}.xlsx';
+        await File(filePath).create(recursive: true);
+        final File file = File(filePath);
+        await file.writeAsBytes(bytes, flush: true);
+        print(path);
+        Toast.show(
+          'File Berada di folder Documents',
+          duration: 2,
+          backgroundColor: Colors.white,
+          gravity: Toast.bottom,
+          rootNavigator: false,
+          textStyle: GoogleFonts.poppins(
+            fontSize: 15,
+            color: Colors.black,
+          ),
+        );
+
+        Future.delayed(Duration(seconds: 1), () {
+          OpenFile.open(filePath);
+        });
+      } else {
+        Toast.show(
+          'Data tidak ada',
+          duration: 2,
+          backgroundColor: Colors.white,
+          gravity: Toast.bottom,
+          rootNavigator: false,
+          textStyle: GoogleFonts.poppins(
+            fontSize: 15,
+            color: Colors.black,
+          ),
+        );
+      }
+    } else {
+      Toast.show(
+        'Ijinkan mengakses penyimpanan',
+        duration: 2,
+        backgroundColor: Colors.white,
+        gravity: Toast.bottom,
+        rootNavigator: false,
+        textStyle: GoogleFonts.poppins(
+          fontSize: 15,
+          color: Colors.black,
+        ),
+      );
+      await Permission.manageExternalStorage.request();
+      await Permission.storage.request();
+    }
   }
 
   @override
@@ -147,6 +256,7 @@ class _AbsensiState extends State<Absensi> {
   Widget build(BuildContext context) {
     var user = ModalRoute.of(context)!.settings.arguments as UserModel;
     // print(user);
+
     var screen = MediaQuery.of(context).size;
     if (TickerMode.of(context)) {
       setState(() {});
@@ -158,7 +268,7 @@ class _AbsensiState extends State<Absensi> {
         statusBarIconBrightness: Brightness.dark,
       ),
     );
-
+    ToastContext().init(context);
     return Scaffold(
       body: Container(
         width: screen.width,
@@ -212,23 +322,46 @@ class _AbsensiState extends State<Absensi> {
                         ),
                       ),
                     ),
-                    Material(
-                      color: Colors.grey.shade300.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(99999),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        splashColor: Colors.white54,
-                        onTap: () => {Navigator.pop(context)},
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          alignment: Alignment.center,
-                          child: FaIcon(
-                            FontAwesomeIcons.arrowLeft,
-                            color: Colors.black.withOpacity(0.6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Material(
+                          color: Colors.grey.shade300.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(99999),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            splashColor: Colors.white54,
+                            onTap: () => {Navigator.pop(context)},
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              alignment: Alignment.center,
+                              child: FaIcon(
+                                FontAwesomeIcons.arrowLeft,
+                                color: Colors.black.withOpacity(0.6),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        Material(
+                          color: Colors.grey.shade300.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(99999),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            splashColor: Colors.white54,
+                            onTap: () => {cetakData()},
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              alignment: Alignment.center,
+                              child: FaIcon(
+                                FontAwesomeIcons.print,
+                                color: Colors.black.withOpacity(0.6),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -424,6 +557,8 @@ class _AbsensiState extends State<Absensi> {
                       if (snapshot.hasData) {
                         loading = false;
                         if (snapshot.data!.length > 0) {
+                          globalAbsensis =
+                              snapshot.data as Iterable<AbsensiModel?>?;
                           loading = false;
                           return Column(
                             children: [
@@ -491,7 +626,7 @@ class _AbsensiState extends State<Absensi> {
                                                 children: [
                                                   Text(
                                                     DateFormat(
-                                                            'dd/MM/yyyy hh:mm:ss')
+                                                            'dd/MM/yyyy HH:mm:ss')
                                                         .format(
                                                           DateTime
                                                               .fromMillisecondsSinceEpoch(
@@ -596,6 +731,7 @@ class _AbsensiState extends State<Absensi> {
                                   );
                                 } else {
                                   loading = false;
+                                  globalAbsensis = null;
                                   return Container(
                                     child: Text(
                                       dataNotFoundText,
@@ -607,6 +743,7 @@ class _AbsensiState extends State<Absensi> {
                             ],
                           );
                         } else {
+                          globalAbsensis = null;
                           loading = false;
                           return Center(
                             child: Container(
@@ -619,11 +756,13 @@ class _AbsensiState extends State<Absensi> {
                         }
                       } else if (snapshot.connectionState ==
                           ConnectionState.waiting) {
+                        globalAbsensis = null;
                         loading = true;
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       } else if (_textSearch != '' && snapshot.data == null) {
+                        globalAbsensis = null;
                         loading = false;
                         return Center(
                             child: Container(
@@ -633,6 +772,7 @@ class _AbsensiState extends State<Absensi> {
                           ),
                         ));
                       } else {
+                        globalAbsensis = null;
                         loading = false;
                         return Center(
                           child: Container(

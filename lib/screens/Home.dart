@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
       var db = FirebaseFirestore.instance;
       var absensiRef = await db
           .collection('absensi')
-          .where('userUid', isEqualTo: user!.uid)
+          .orderBy('createdAt', descending: true)
           .get();
       var absensis = await absensiRef.docs.map((data) {
         return AbsensiModel(
@@ -92,7 +92,10 @@ class _HomeState extends State<Home> {
           userUid: data.data()['userUid'],
         );
       });
-
+      if (userBox.get('role') == 'siswa') {
+        absensis =
+            absensis.where((element) => element.userUid == userBox.get('uid'));
+      }
       return absensis;
     }
 
@@ -576,7 +579,7 @@ class _HomeState extends State<Home> {
                                                             children: [
                                                               Text(
                                                                 DateFormat(
-                                                                        'dd/MM/yyyy hh:mm:ss')
+                                                                        'dd/MM/yyyy HH:mm:ss')
                                                                     .format(
                                                                       DateTime
                                                                           .fromMillisecondsSinceEpoch(
@@ -814,7 +817,7 @@ class _HomeState extends State<Home> {
                                                             children: [
                                                               Text(
                                                                 DateFormat(
-                                                                        'dd/MM/yyyy hh:mm:ss')
+                                                                        'dd/MM/yyyy HH:mm:ss')
                                                                     .format(DateTime
                                                                         .fromMillisecondsSinceEpoch(
                                                                       history

@@ -13,11 +13,10 @@ import 'package:e_jupe_skensa/screens/profile/EditProfile.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Hive.initFlutter();
   await Firebase.initializeApp(
@@ -25,7 +24,6 @@ void main() async {
   );
   // ignore: unused_local_variable
   var userBox = await Hive.openBox('user');
-
   runApp(const MyApp());
   // FlutterNativeSplash.remove();
 }
