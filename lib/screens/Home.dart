@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -31,7 +32,18 @@ class _HomeState extends State<Home> {
     if (userBox.get('uid') == null) {
       Navigator.pushReplacementNamed(context, onboardingRoute);
     }
-
+    if (user == null || user!.uid == null) {
+      user = UserModel(
+        uid: userBox.get('uid'),
+        fullName: userBox.get('fullName'),
+        email: userBox.get('email'),
+        role: userBox.get('role'),
+        profile: userBox.get('profile'),
+      );
+      setState(() {
+        user;
+      });
+    }
     // TODO: implement initState
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -76,6 +88,11 @@ class _HomeState extends State<Home> {
   }
 
   Future<Iterable<AbsensiModel>> getAbsensi() async {
+    await Permission.manageExternalStorage.request();
+    // if (await Permission.manageExternalStorage.isDenied) {
+    // } else if (await Permission.storage.isDenied) {
+    //   await Permission.storage.request();
+    // }
     Future<Iterable<AbsensiModel>> siswa() async {
       var db = FirebaseFirestore.instance;
       var absensiRef = await db
@@ -209,7 +226,11 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     var screen = MediaQuery.of(context).size;
-    if (userBox.get('uid') == null && userBox.get('email') == null) {
+    if (userBox.get('uid') == null &&
+        userBox.get('email') == null &&
+        userBox.get('role') == null &&
+        userBox.get('profile') == null &&
+        userBox.get('fullName') == null) {
       Navigator.pushReplacementNamed(context, onboardingRoute);
     }
 
@@ -227,6 +248,18 @@ class _HomeState extends State<Home> {
       });
     }
     if (TickerMode.of(context)) {
+      if (user == null || user!.uid == null) {
+        user = UserModel(
+          uid: userBox.get('uid'),
+          fullName: userBox.get('fullName'),
+          email: userBox.get('email'),
+          role: userBox.get('role'),
+          profile: userBox.get('profile'),
+        );
+        setState(() {
+          user;
+        });
+      }
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,

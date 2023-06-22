@@ -150,7 +150,7 @@ class _AbsensiState extends State<Absensi> {
   void cetakData() async {
     var managestorage = await Permission.manageExternalStorage;
     var storage = await Permission.storage.request();
-    if (await storage.isGranted && await managestorage.isGranted) {
+    if (await managestorage.isGranted) {
       if (globalAbsensis != null) {
         final Workbook workbook = Workbook();
         final Worksheet sheet = workbook.worksheets[0];
@@ -230,11 +230,7 @@ class _AbsensiState extends State<Absensi> {
         );
       }
     } else {
-      if (await Permission.manageExternalStorage.isDenied) {
-        await Permission.manageExternalStorage.request();
-      } else if (await Permission.storage.isDenied) {
-        await Permission.storage.request();
-      }
+      await Permission.manageExternalStorage.request();
       Toast.show(
         'Ijinkan mengakses penyimpanan',
         duration: 2,

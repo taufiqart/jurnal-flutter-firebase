@@ -30,7 +30,13 @@ class _ScreensState extends State<Screens> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       var userBox = Hive.box('user');
-      if (userBox.isEmpty) {
+
+      if (userBox.isEmpty ||
+          userBox.get('uid') == null ||
+          userBox.get('email') == null ||
+          userBox.get('role') == null ||
+          userBox.get('profile') == null ||
+          userBox.get('fullName') == null) {
         Navigator.pushReplacementNamed(context, onboardingRoute);
       }
     });

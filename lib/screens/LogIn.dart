@@ -66,6 +66,11 @@ class _LogInState extends State<LogIn> {
             userBox.put('email', data?['email']);
             userBox.put('profile', data?['profile'] ?? defautlPic);
             userBox.put('uid', value.id);
+            // print(userBox.get('fullName'));
+            // print(userBox.get('role'));
+            // print(userBox.get('email'));
+            // print(userBox.get('profile'));
+            // print(userBox.get('uid'));
             // userBox.putAll(data as Map<dynamic, dynamic>);
             Toast.show(
               successMasukText,
