@@ -14,7 +14,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -32,6 +31,7 @@ class _HomeState extends State<Home> {
     if (userBox.get('uid') == null) {
       Navigator.pushReplacementNamed(context, onboardingRoute);
     }
+    // ignore: unnecessary_null_comparison
     if (user == null || user!.uid == null) {
       user = UserModel(
         uid: userBox.get('uid'),
@@ -88,7 +88,6 @@ class _HomeState extends State<Home> {
   }
 
   Future<Iterable<AbsensiModel>> getAbsensi() async {
-    
     Future<Iterable<AbsensiModel>> siswa() async {
       var db = FirebaseFirestore.instance;
       var absensiRef = await db
@@ -244,6 +243,7 @@ class _HomeState extends State<Home> {
       });
     }
     if (TickerMode.of(context)) {
+      // ignore: unnecessary_null_comparison
       if (user == null || user!.uid == null) {
         user = UserModel(
           uid: userBox.get('uid'),

@@ -219,9 +219,9 @@ class _JurnalState extends State<Jurnal> {
   }
 
   void cetakData() async {
-    var managestorage = await Permission.manageExternalStorage.status;
-    var storage = await Permission.storage.status;
-    if (storage.isGranted && managestorage.isGranted) {
+    var managestorage = await Permission.manageExternalStorage;
+    var storage = await Permission.storage;
+    if (await storage.isGranted && await managestorage.isGranted) {
       if (globalJurnal != null) {
         final Workbook workbook = Workbook();
         final Worksheet sheet = workbook.worksheets[0];

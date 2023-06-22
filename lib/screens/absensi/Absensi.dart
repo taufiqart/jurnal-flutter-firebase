@@ -150,7 +150,7 @@ class _AbsensiState extends State<Absensi> {
   void cetakData() async {
     var managestorage = await Permission.manageExternalStorage;
     var storage = await Permission.storage.request();
-    if (await managestorage.isGranted) {
+    if (await managestorage.isGranted && await storage.isGranted) {
       if (globalAbsensis != null) {
         final Workbook workbook = Workbook();
         final Worksheet sheet = workbook.worksheets[0];
