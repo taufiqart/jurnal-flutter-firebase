@@ -88,11 +88,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<Iterable<AbsensiModel>> getAbsensi() async {
-    await Permission.manageExternalStorage.request();
-    // if (await Permission.manageExternalStorage.isDenied) {
-    // } else if (await Permission.storage.isDenied) {
-    //   await Permission.storage.request();
-    // }
+    
     Future<Iterable<AbsensiModel>> siswa() async {
       var db = FirebaseFirestore.instance;
       var absensiRef = await db

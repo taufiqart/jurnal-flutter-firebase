@@ -194,8 +194,11 @@ class _AbsensiState extends State<Absensi> {
             await ExternalPath.getExternalStoragePublicDirectory(
                 ExternalPath.DIRECTORY_DOCUMENTS);
 
-        var fileName =
-            DateTime.now().toString().replaceAll(' ', '_').split('.')[0];
+        var fileName = DateTime.now()
+            .toString()
+            .replaceAll(':', '')
+            .replaceAll(' ', '_')
+            .split('.')[0];
         final String filePath = '${path}/absensi-${fileName}.xlsx';
         await File(filePath).create(recursive: true);
         final File file = File(filePath);
@@ -342,24 +345,30 @@ class _AbsensiState extends State<Absensi> {
                             ),
                           ),
                         ),
-                        Material(
-                          color: Colors.grey.shade300.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(99999),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            splashColor: Colors.white54,
-                            onTap: () => {cetakData()},
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              alignment: Alignment.center,
-                              child: FaIcon(
-                                FontAwesomeIcons.print,
-                                color: Colors.black.withOpacity(0.6),
+                        userBox.get('role') != 'siswa'
+                            ? Material(
+                                color: Colors.grey.shade300.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(99999),
+                                clipBehavior: Clip.antiAlias,
+                                child: InkWell(
+                                  splashColor: Colors.white54,
+                                  onTap: () => {cetakData()},
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    alignment: Alignment.center,
+                                    child: FaIcon(
+                                      FontAwesomeIcons.print,
+                                      color: Colors.black.withOpacity(0.6),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Material(
+                                color: Colors.grey.shade300.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(99999),
+                                clipBehavior: Clip.antiAlias,
                               ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],

@@ -59,37 +59,47 @@ class _LogInState extends State<LogIn> {
             .then(
           (value) async {
             final data = await value.data();
-            final userBox = Hive.box('user');
-
-            userBox.put('fullName', data?['fullName']);
-            userBox.put('role', data?['role']);
-            userBox.put('email', data?['email']);
-            userBox.put('profile', data?['profile'] ?? defautlPic);
-            userBox.put('uid', value.id);
-            // print(userBox.get('fullName'));
-            // print(userBox.get('role'));
-            // print(userBox.get('email'));
-            // print(userBox.get('profile'));
-            // print(userBox.get('uid'));
-            // userBox.putAll(data as Map<dynamic, dynamic>);
-            Toast.show(
-              successMasukText,
-              duration: 2,
-              backgroundColor: Colors.white,
-              gravity: Toast.bottom,
-              rootNavigator: false,
-              textStyle: GoogleFonts.poppins(
-                fontSize: 15,
-                color: Colors.black,
-              ),
-            );
-
-            setState(() {
-              Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (data?['fullName'] == null ||
+                data?['role'] == null ||
+                data?['email'] == null) {
+              setState(() {
+                emailError = 'akun tidak di temukan';
+                _formKey.currentState!.validate();
                 loading = false;
-                Navigator.pushReplacementNamed(context, homeRoute);
               });
-            });
+            } else {
+              final userBox = Hive.box('user');
+
+              userBox.put('fullName', data?['fullName']);
+              userBox.put('role', data?['role']);
+              userBox.put('email', data?['email']);
+              userBox.put('profile', data?['profile'] ?? defautlPic);
+              userBox.put('uid', value.id);
+              print(userBox.get('fullName'));
+              print(userBox.get('role'));
+              print(userBox.get('email'));
+              print(userBox.get('profile'));
+              print(userBox.get('uid'));
+              // userBox.putAll(data as Map<dynamic, dynamic>);
+              Toast.show(
+                successMasukText,
+                duration: 2,
+                backgroundColor: Colors.white,
+                gravity: Toast.bottom,
+                rootNavigator: false,
+                textStyle: GoogleFonts.poppins(
+                  fontSize: 15,
+                  color: Colors.black,
+                ),
+              );
+
+              setState(() {
+                Timer.periodic(const Duration(seconds: 1), (timer) {
+                  loading = false;
+                  Navigator.pushReplacementNamed(context, homeRoute);
+                });
+              });
+            }
           },
         );
       } on FirebaseAuthException catch (e) {
